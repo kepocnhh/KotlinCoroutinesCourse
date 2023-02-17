@@ -1,5 +1,7 @@
 repositories.mavenCentral()
 
+version = Version.sample
+
 plugins {
     application
     kotlin("jvm")
