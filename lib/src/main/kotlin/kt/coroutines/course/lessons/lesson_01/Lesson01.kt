@@ -1,6 +1,8 @@
 package kt.coroutines.course.lessons.lesson_01
 
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -19,8 +21,14 @@ object Lesson01 {
         learnSynchronous()
         println("\n\t---")
         learnParallel()
+        println("\n\t---")
+        learnAsyncAwait(CoroutineStart.DEFAULT)
+        println("\n\t--- synchronous")
+        learnAsyncAwait(CoroutineStart.LAZY)
     }
 }
+
+private const val TIMES = 6
 
 private fun learnGlobalScope() {
     println("try launch a new coroutine in \"GlobalScope\"...")
@@ -47,7 +55,7 @@ private fun learnSynchronous() {
     println("run synchronous...")
     val elapsed = measureTimeMillis {
         runBlocking {
-            repeat(9) { index ->
+            repeat(TIMES) { index ->
                 println(heavyMap("synchronous: $index"))
             }
         }
@@ -59,7 +67,7 @@ private fun learnParallel() {
     println("run parallel...")
     val elapsed = measureTimeMillis {
         runBlocking {
-            repeat(9) { index ->
+            repeat(TIMES) { index ->
                 launch {
                     println(heavyMap("parallel: $index"))
                 }
@@ -67,6 +75,21 @@ private fun learnParallel() {
         }
     }.milliseconds
     println("parallel is finished: $elapsed")
+}
+
+private fun learnAsyncAwait(start: CoroutineStart) {
+    println("run deferred($start) jobs...")
+    val elapsed = measureTimeMillis {
+        runBlocking {
+            val jobs = List(TIMES) { index ->
+                async(start = start) {
+                    heavyMap("deferred($start): $index")
+                }
+            }
+            jobs.forEach { println(it.await()) }
+        }
+    }.milliseconds
+    println("deferred($start) jobs is finished: $elapsed")
 }
 
 private suspend fun heavyMapOld(it: String): String {
