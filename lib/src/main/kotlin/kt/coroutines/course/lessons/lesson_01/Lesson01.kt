@@ -1,8 +1,11 @@
 package kt.coroutines.course.lessons.lesson_01
 
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlin.math.absoluteValue
+import kotlin.system.measureTimeMillis
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -12,6 +15,10 @@ object Lesson01 {
         learnGlobalScope()
         println("\n\t---")
         learnRunBlocking()
+        println("\n\t---")
+        learnSynchronous()
+        println("\n\t---")
+        learnParallel()
     }
 }
 
@@ -36,10 +43,42 @@ private fun learnRunBlocking() {
     println("a new coroutine is finished")
 }
 
+private fun learnSynchronous() {
+    println("run synchronous...")
+    val elapsed = measureTimeMillis {
+        runBlocking {
+            repeat(9) { index ->
+                println(heavyMap("synchronous: $index"))
+            }
+        }
+    }.milliseconds
+    println("synchronous is finished: $elapsed")
+}
+
+private fun learnParallel() {
+    println("run parallel...")
+    val elapsed = measureTimeMillis {
+        runBlocking {
+            repeat(9) { index ->
+                launch {
+                    println(heavyMap("parallel: $index"))
+                }
+            }
+        }
+    }.milliseconds
+    println("parallel is finished: $elapsed")
+}
+
 private suspend fun heavyMapOld(it: String): String {
     val start = System.currentTimeMillis().milliseconds
     while (true) {
         val now = System.currentTimeMillis().milliseconds
         if (now - start > 2.seconds) return "Mapped: \"$it\""
     }
+}
+
+private suspend fun heavyMap(it: String): String {
+    val seconds = it.hashCode().absoluteValue % 3 + 1
+    delay(seconds.seconds)
+    return "Mapped: \"$it\" ($seconds seconds)"
 }
