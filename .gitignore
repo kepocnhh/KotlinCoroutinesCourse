@@ -1,5 +1,6 @@
 /*
 !/buildSrc
+!/sample
 !.gitignore
 !README.md
 !build.gradle.kts
