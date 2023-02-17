@@ -8,3 +8,7 @@ plugins {
 application {
     mainClass.set("kt.coroutines.course.AppKt")
 }
+
+dependencies {
+    implementation(project(":lib"))
+}
