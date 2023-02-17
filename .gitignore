@@ -1,5 +1,6 @@
 /*
 !/buildSrc
+!/lib
 !/sample
 !.gitignore
 !README.md

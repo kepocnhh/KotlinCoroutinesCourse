@@ -1,3 +1,3 @@
 rootProject.name = "KotlinCoroutinesCourse"
 
-include("sample")
+include("lib", "sample")
