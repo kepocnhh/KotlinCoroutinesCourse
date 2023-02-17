@@ -7,8 +7,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlin.math.absoluteValue
-import kotlin.system.measureTimeMillis
+import kotlin.system.measureNanoTime
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 
 object Lesson01 {
@@ -23,7 +24,7 @@ object Lesson01 {
         learnParallel()
         println("\n\t---")
         learnAsyncAwait(CoroutineStart.DEFAULT)
-        println("\n\t--- synchronous")
+        println("\n\t---")
         learnAsyncAwait(CoroutineStart.LAZY)
     }
 }
@@ -53,19 +54,19 @@ private fun learnRunBlocking() {
 
 private fun learnSynchronous() {
     println("run synchronous...")
-    val elapsed = measureTimeMillis {
+    val elapsed = measureNanoTime {
         runBlocking {
             repeat(TIMES) { index ->
                 println(heavyMap("synchronous: $index"))
             }
         }
-    }.milliseconds
+    }.nanoseconds
     println("synchronous is finished: $elapsed")
 }
 
 private fun learnParallel() {
     println("run parallel...")
-    val elapsed = measureTimeMillis {
+    val elapsed = measureNanoTime {
         runBlocking {
             repeat(TIMES) { index ->
                 launch {
@@ -73,13 +74,13 @@ private fun learnParallel() {
                 }
             }
         }
-    }.milliseconds
+    }.nanoseconds
     println("parallel is finished: $elapsed")
 }
 
 private fun learnAsyncAwait(start: CoroutineStart) {
     println("run deferred($start) jobs...")
-    val elapsed = measureTimeMillis {
+    val elapsed = measureNanoTime {
         runBlocking {
             val jobs = List(TIMES) { index ->
                 async(start = start) {
@@ -88,7 +89,7 @@ private fun learnAsyncAwait(start: CoroutineStart) {
             }
             jobs.forEach { println(it.await()) }
         }
-    }.milliseconds
+    }.nanoseconds
     println("deferred($start) jobs is finished: $elapsed")
 }
 
