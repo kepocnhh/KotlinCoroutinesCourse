@@ -2,6 +2,7 @@ package kt.coroutines.course.lessons.lesson_01
 
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -9,6 +10,8 @@ object Lesson01 {
     fun learn() {
         println("\n\t---")
         learnGlobalScope()
+        println("\n\t---")
+        learnRunBlocking()
     }
 }
 
@@ -20,15 +23,23 @@ private fun learnGlobalScope() {
                 "which are operating on the whole application lifetime and are not cancelled prematurely."
     )
     GlobalScope.launch {
-        println(heavyMapOld("foo bar"))
+        println(heavyMapOld("launched in GlobalScope"))
     }
     println("a new coroutine in \"GlobalScope\" is launched")
+}
+
+private fun learnRunBlocking() {
+    println("try run a new coroutine and block the current thread...")
+    runBlocking {
+        println(heavyMapOld("run and block"))
+    }
+    println("a new coroutine is finished")
 }
 
 private suspend fun heavyMapOld(it: String): String {
     val start = System.currentTimeMillis().milliseconds
     while (true) {
         val now = System.currentTimeMillis().milliseconds
-        if (start - now > 2.seconds) return "Mapped: \"$it\""
+        if (now - start > 2.seconds) return "Mapped: \"$it\""
     }
 }
