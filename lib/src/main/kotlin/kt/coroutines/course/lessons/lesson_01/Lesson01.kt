@@ -3,6 +3,7 @@ package kt.coroutines.course.lessons.lesson_01
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -26,6 +27,8 @@ object Lesson01 {
         learnAsyncAwait(CoroutineStart.DEFAULT)
         println("\n\t---")
         learnAsyncAwait(CoroutineStart.LAZY)
+        println("\n\t---")
+        learnScope()
     }
 }
 
@@ -105,4 +108,22 @@ private suspend fun heavyMap(it: String): String {
     val seconds = it.hashCode().absoluteValue % 3 + 1
     delay(seconds.seconds)
     return "Mapped: \"$it\" ($seconds seconds)"
+}
+
+private fun learnScope() {
+    println("run blocking(regular fun)...")
+    runBlocking {
+        println("blocking started")
+        println("run coroutine scope(suspend fun)...")
+        coroutineScope {
+            println("coroutine scope started")
+            repeat(TIMES) { index ->
+                launch {
+                    println(heavyMap("coroutine scope: $index"))
+                }
+            }
+        }
+        println("coroutine scope finish")
+    }
+    println("blocking finish")
 }
