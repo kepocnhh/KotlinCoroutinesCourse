@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
@@ -31,6 +32,8 @@ object Lesson02 {
         learnNonCancellable()
         println("\n\t---")
         learnTimeout()
+        println("\n\t---")
+        learnTimeoutOrNull()
     }
 }
 
@@ -162,7 +165,6 @@ private fun learnNonCancellable() {
     }
 }
 
-
 private fun learnTimeout() {
     runBlocking {
         val time = 4.seconds
@@ -182,5 +184,34 @@ private fun learnTimeout() {
             println("unexpected with timeout($time) error: $e")
         }
         println("with timeout($time) finish")
+    }
+}
+
+private fun learnTimeoutOrNull() {
+    runBlocking {
+        (3 to 5).also { (seconds, times) ->
+            val time = seconds.seconds
+            println("with timeout($time)...")
+            val result = withTimeoutOrNull(time) {
+                println("start with timeout($time)")
+                repeat(times) { index ->
+                    delay(1.seconds)
+                }
+                "result:$seconds/$times"
+            }
+            println("result with timeout($time): $result")
+        }
+        (5 to 3).also { (seconds, times) ->
+            val time = seconds.seconds
+            println("with timeout($time)...")
+            val result = withTimeoutOrNull(time) {
+                println("start with timeout($time)")
+                repeat(times) { index ->
+                    delay(1.seconds)
+                }
+                "result:$seconds/$times"
+            }
+            println("result with timeout($time): $result")
+        }
     }
 }
