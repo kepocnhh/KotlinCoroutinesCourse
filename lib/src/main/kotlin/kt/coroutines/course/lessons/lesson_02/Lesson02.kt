@@ -4,12 +4,14 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
@@ -27,6 +29,8 @@ object Lesson02 {
         learnFinally()
         println("\n\t---")
         learnNonCancellable()
+        println("\n\t---")
+        learnTimeout()
     }
 }
 
@@ -112,15 +116,10 @@ private fun learnFinally() {
                     println("job: ${index++}")
                     delay(1.5.seconds)
                 }
+            } catch (e: CancellationException) {
+                println("job cancelled: $e")
             } catch (e: Throwable) {
-                when (e) {
-                    is CancellationException -> {
-                        println("job cancelled: $e")
-                    }
-                    else -> {
-                        println("unexpected job error: $e")
-                    }
-                }
+                println("unexpected job error: $e")
             } finally {
                 println("job finish")
             }
@@ -160,5 +159,28 @@ private fun learnNonCancellable() {
         println("cancel and join job: $job")
         job.cancelAndJoin()
         println("cancelled and joined job: $job")
+    }
+}
+
+
+private fun learnTimeout() {
+    runBlocking {
+        val time = 4.seconds
+        println("with timeout($time)...")
+        try {
+            withTimeout(time) {
+                println("start with timeout($time)")
+                var index = 0
+                while (true) {
+                    println("times: ${index++}")
+                    delay(1.5.seconds)
+                }
+            }
+        } catch (e: TimeoutCancellationException) {
+            println("timeout: $e")
+        } catch (e: Throwable) {
+            println("unexpected with timeout($time) error: $e")
+        }
+        println("with timeout($time) finish")
     }
 }
