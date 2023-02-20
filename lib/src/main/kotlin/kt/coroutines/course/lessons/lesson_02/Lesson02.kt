@@ -1,5 +1,6 @@
 package kt.coroutines.course.lessons.lesson_02
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
@@ -20,6 +21,8 @@ object Lesson02 {
         learnCancel()
         println("\n\t---")
         learnCancellation()
+        println("\n\t---")
+        learnFinally()
     }
 }
 
@@ -84,6 +87,39 @@ private fun learnCancellation() {
                 }
             }
             println("job is not active")
+        }
+        println("start delay")
+        delay(4.seconds)
+        println("finish delay")
+        println("cancel and join job: $job")
+        job.cancelAndJoin()
+        println("cancelled and joined job: $job")
+    }
+}
+
+private fun learnFinally() {
+    runBlocking {
+        println("launch job...")
+        val job = launch {
+            println("job launched")
+            var index = 0
+            try {
+                while (true) {
+                    println("job: ${index++}")
+                    delay(1.5.seconds)
+                }
+            } catch (e: Throwable) {
+                when (e) {
+                    is CancellationException -> {
+                        println("job cancelled: $e")
+                    }
+                    else -> {
+                        println("unexpected job error: $e")
+                    }
+                }
+            } finally {
+                println("job finish")
+            }
         }
         println("start delay")
         delay(4.seconds)
