@@ -3,11 +3,13 @@ package kt.coroutines.course.lessons.lesson_02
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.nanoseconds
@@ -23,6 +25,8 @@ object Lesson02 {
         learnCancellation()
         println("\n\t---")
         learnFinally()
+        println("\n\t---")
+        learnNonCancellable()
     }
 }
 
@@ -119,6 +123,35 @@ private fun learnFinally() {
                 }
             } finally {
                 println("job finish")
+            }
+        }
+        println("start delay")
+        delay(4.seconds)
+        println("finish delay")
+        println("cancel and join job: $job")
+        job.cancelAndJoin()
+        println("cancelled and joined job: $job")
+    }
+}
+
+private fun learnNonCancellable() {
+    runBlocking {
+        println("launch job...")
+        val job = launch {
+            println("job launched")
+            var index = 0
+            try {
+                while (true) {
+                    println("job: ${index++}")
+                    delay(1.5.seconds)
+                }
+            } finally {
+//                delay(2.seconds) // return immediately
+                withContext(NonCancellable) {
+                    println("start delay finally")
+                    delay(2.seconds)
+                    println("finish delay finally")
+                }
             }
         }
         println("start delay")
