@@ -34,6 +34,8 @@ object Lesson02 {
         learnTimeout()
         println("\n\t---")
         learnTimeoutOrNull()
+        println("\n\t---")
+        learnDispatchers()
     }
 }
 
@@ -213,5 +215,24 @@ private fun learnTimeoutOrNull() {
             }
             println("result with timeout($time): $result")
         }
+    }
+}
+
+private fun learnDispatchers() {
+    runBlocking {
+        println("\t- launch...")
+        launch(Dispatchers.IO) {
+            println("\t\t- launch async IO")
+            delay(3.seconds)
+            println("\t\t- finish launch async IO")
+        }
+        println("\t- after launch")
+        println("\t+ with context...")
+        withContext(Dispatchers.IO) {
+            println("\t\t+ launch sync IO")
+            delay(3.seconds)
+            println("\t\t+ finish launch sync IO")
+        }
+        println("\t+ after with context")
     }
 }
