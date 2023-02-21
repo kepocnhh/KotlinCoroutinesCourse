@@ -1,9 +1,11 @@
 package kt.coroutines.course.lessons.lesson_03
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlin.system.measureTimeMillis
@@ -21,6 +23,10 @@ object Lesson03 {
         learnConcurrentLazy()
         println("\n\t---")
         learnDeferred()
+        println("\n\t---")
+        learnStructuredConcurrency()
+        println("\n\t---")
+        learnStructuredConcurrencyError()
     }
 }
 
@@ -82,6 +88,68 @@ private fun learnDeferred() {
         }
     }.milliseconds
     println("Completed in $time")
+}
+
+private fun learnStructuredConcurrency() {
+    runBlocking {
+        println("measure structured concurrency...")
+        val time = measureTimeMillis {
+            println("The answer is ${concurrentSum()}")
+        }.milliseconds
+        println("Completed in $time")
+    }
+}
+
+private fun learnStructuredConcurrencyError() {
+    runBlocking {
+        println("measure structured concurrency error...")
+        val time = measureTimeMillis {
+            try {
+                println("The answer is ${concurrentSumError()}")
+            } catch (e: Throwable) {
+                println("sum error: $e")
+            }
+        }.milliseconds
+        println("Completed in $time")
+    }
+}
+
+suspend fun concurrentSum(): Int {
+    return coroutineScope {
+        val one = async {
+            println("start async 1")
+            delayAndGet(2.seconds, 13)
+        }
+        val two = async {
+            println("start async 2")
+            delayAndGet(1.seconds, 29)
+        }
+        println("start awaits")
+        one.await() + two.await()
+    }
+}
+
+suspend fun concurrentSumError(): Int {
+    return coroutineScope {
+        val one = async {
+            println("\tstart async 1")
+            try {
+                delayAndGet(42.seconds, 13)
+            } catch (e: CancellationException) {
+                println("\t\tcanceled async 1")
+                -1 // todo ?
+            } finally {
+                println("\t\tfinish async 1")
+            }
+        }
+        val two = async<Int> {
+            println("\tstart async 2")
+            delay(1.seconds)
+            error("error async 2")
+        }
+        println("start awaits")
+        one.await() + two.await()
+    }
 }
 
 private suspend fun <T : Any> delayAndGet(time: Duration, value: T): T {
