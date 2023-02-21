@@ -1,6 +1,8 @@
 package kt.coroutines.course.lessons.lesson_03
 
 import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -17,6 +19,8 @@ object Lesson03 {
         learnConcurrent()
         println("\n\t---")
         learnConcurrentLazy()
+        println("\n\t---")
+        learnDeferred()
     }
 }
 
@@ -68,7 +72,26 @@ private fun learnConcurrentLazy() {
     }
 }
 
+private fun learnDeferred() {
+    println("measure deferred...")
+    val time = measureTimeMillis {
+        val one = delayAndGetAsync(2.seconds, 13)
+        val two = delayAndGetAsync(1.seconds, 29)
+        runBlocking {
+            println("The answer is ${one.await() + two.await()}")
+        }
+    }.milliseconds
+    println("Completed in $time")
+}
+
 private suspend fun <T : Any> delayAndGet(time: Duration, value: T): T {
     delay(time)
     return value
+}
+
+private fun <T : Any> delayAndGetAsync(time: Duration, value: T): Deferred<T> {
+    return GlobalScope.async {
+        println("start async: $value")
+        delayAndGet(time, value = value)
+    }
 }
