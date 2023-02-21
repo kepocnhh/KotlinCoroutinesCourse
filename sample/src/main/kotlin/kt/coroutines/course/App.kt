@@ -2,6 +2,7 @@ package kt.coroutines.course
 
 import kt.coroutines.course.lessons.lesson_01.Lesson01
 import kt.coroutines.course.lessons.lesson_02.Lesson02
+import kt.coroutines.course.lessons.lesson_03.Lesson03
 
 private fun printHelp() {
 	println(
@@ -22,6 +23,7 @@ fun main(args: Array<String>) {
 	when (args.single()) {
 		"lesson1" -> Lesson01.learn()
 		"lesson2" -> Lesson02.learn()
+		"lesson3" -> Lesson03.learn()
 		else -> printHelp()
 	}
 }
